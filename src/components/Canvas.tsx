@@ -2,12 +2,14 @@ import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { HTMLElement } from '@/types/EditorTypes';
 import { ElementRenderer } from '@/components/elements/ElementRenderer';
+import { RightSidebar } from './RightSidebar';
 
 interface CanvasProps {
   elements: HTMLElement[];
   onDrop: (item: HTMLElement) => void;
   onReposition: (dragIndex: number, hoverIndex: number) => void;
   onDelete: (id: string) => void;
+  onUpdateElement: (updatedElement: HTMLElement) => void;
 }
 
 export function Canvas({
@@ -15,19 +17,20 @@ export function Canvas({
   onDrop,
   onReposition,
   onDelete,
+  onUpdateElement,
 }: CanvasProps) {
   const [selectedElementId, setSelectedElementId] = useState<string | null>(
     null
   );
   const dropRef = useRef<HTMLDivElement>(null);
-  const [, drop] = useDrop(() => ({
+  const [, drop] = useDrop({
     accept: ['element', 'canvasElement'],
     drop: (item: HTMLElement & { index?: number }, monitor) => {
       if (monitor.getItemType() === 'element') {
         onDrop(item);
       }
     },
-  }));
+  });
 
   drop(dropRef);
 
@@ -42,28 +45,41 @@ export function Canvas({
     setSelectedElementId(null);
   };
 
+  const selectedElement =
+    elements.find((el) => el.id === selectedElementId) || null;
+
+  const handleElementSelect = (id: string) => {
+    setSelectedElementId((prevId) => (prevId === id ? null : id));
+  };
+
   return (
-    <div
-      ref={dropRef}
-      className="flex-grow bg-gray-700 p-4"
-      onClick={handleCanvasClick}
-    >
-      <div className="bg-gray-800 rounded-lg p-4 h-full">
-        {elements.map((element, index) => (
-          <DraggableElement
-            key={element.id}
-            element={element}
-            index={index}
-            onReposition={onReposition}
-            onDelete={handleDelete}
-            isSelected={selectedElementId === element.id}
-            onSelect={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              setSelectedElementId(element.id);
-            }}
-          />
-        ))}
+    <div className="flex flex-grow">
+      <div
+        ref={dropRef}
+        className="flex-grow bg-gray-700 p-4"
+        onClick={handleCanvasClick}
+      >
+        <div className="bg-gray-800 rounded-lg p-4 h-full">
+          {elements.map((element, index) => (
+            <DraggableElement
+              key={element.id}
+              element={element}
+              index={index}
+              onReposition={onReposition}
+              onDelete={handleDelete}
+              isSelected={selectedElementId === element.id}
+              onSelect={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                handleElementSelect(element.id);
+              }}
+            />
+          ))}
+        </div>
       </div>
+      <RightSidebar
+        selectedElement={selectedElement}
+        onUpdateElement={onUpdateElement}
+      />
     </div>
   );
 }

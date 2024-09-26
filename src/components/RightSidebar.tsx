@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { useDrag } from 'react-dnd';
 import { HTMLElement } from '@/types/EditorTypes';
+import { ElementEditor } from '@/components/elements/ElementEditor';
 
 const elementTypes: HTMLElement[] = [
   { id: 'heading', type: 'heading', content: 'Heading' },
@@ -8,13 +9,27 @@ const elementTypes: HTMLElement[] = [
   // Add more element types as needed
 ];
 
-export function RightSidebar() {
+interface RightSidebarProps {
+  selectedElement: HTMLElement | null;
+  onUpdateElement: (updatedElement: HTMLElement) => void;
+}
+
+export function RightSidebar({
+  selectedElement,
+  onUpdateElement,
+}: RightSidebarProps) {
   return (
     <div className="w-64 bg-gray-800 p-4">
-      <h2 className="text-white text-lg font-semibold mb-4">Elements</h2>
-      {elementTypes.map((element) => (
-        <DraggableElementType key={element.id} element={element} />
-      ))}
+      {selectedElement ? (
+        <ElementEditor element={selectedElement} onUpdate={onUpdateElement} />
+      ) : (
+        <>
+          <h2 className="text-white text-lg font-semibold mb-4">Elements</h2>
+          {elementTypes.map((element) => (
+            <DraggableElementType key={element.id} element={element} />
+          ))}
+        </>
+      )}
     </div>
   );
 }

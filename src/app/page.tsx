@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { LeftSidebar } from '@/components/LeftSidebar';
-import { RightSidebar } from '@/components/RightSidebar';
 import { Canvas } from '@/components/Canvas';
 import { HTMLElement, CanvasState } from '@/types/EditorTypes';
 
@@ -42,6 +41,14 @@ export default function Home() {
     }));
   };
 
+  const handleUpdateElement = (updatedElement: HTMLElement) => {
+    setCanvasState((prevState) => ({
+      elements: prevState.elements.map((element) =>
+        element.id === updatedElement.id ? updatedElement : element
+      ),
+    }));
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex h-screen bg-gray-900">
@@ -56,10 +63,10 @@ export default function Home() {
               onDrop={handleDrop}
               onReposition={handleReposition}
               onDelete={handleDelete}
+              onUpdateElement={handleUpdateElement}
             />
           </div>
         </main>
-        <RightSidebar />
       </div>
     </DndProvider>
   );
