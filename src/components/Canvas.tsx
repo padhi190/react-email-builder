@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { HTMLElement } from '@/types/EditorTypes';
 import { ElementRenderer } from '@/components/elements/ElementRenderer';
@@ -6,7 +6,7 @@ import { RightSidebar } from './RightSidebar';
 
 interface CanvasProps {
   elements: HTMLElement[];
-  onDrop: (item: HTMLElement) => void;
+  onDrop: (item: HTMLElement, index: number) => void;
   onReposition: (dragIndex: number, hoverIndex: number) => void;
   onDelete: (id: string) => void;
   onUpdateElement: (updatedElement: HTMLElement) => void;
@@ -22,12 +22,26 @@ export function Canvas({
   const [selectedElementId, setSelectedElementId] = useState<string | null>(
     null
   );
+  const [dropTarget, setDropTarget] = useState<{
+    index: number;
+    position: 'above' | 'below';
+  } | null>(null);
   const dropRef = useRef<HTMLDivElement>(null);
   const [, drop] = useDrop({
     accept: ['element', 'canvasElement'],
+    hover: (item: HTMLElement & { index?: number }, monitor) => {
+      if (monitor.getItemType() === 'element' && dropTarget === null) {
+        setDropTarget({ index: elements.length, position: 'below' });
+      }
+    },
     drop: (item: HTMLElement & { index?: number }, monitor) => {
-      if (monitor.getItemType() === 'element') {
-        onDrop(item);
+      if (monitor.getItemType() === 'element' && dropTarget) {
+        const newIndex =
+          dropTarget.position === 'below'
+            ? dropTarget.index + 1
+            : dropTarget.index;
+        onDrop(item, newIndex);
+        setDropTarget(null);
       }
     },
   });
@@ -52,6 +66,17 @@ export function Canvas({
     setSelectedElementId((prevId) => (prevId === id ? null : id));
   };
 
+  const handleDrop = useCallback(
+    (index: number, position: 'above' | 'below') => {
+      return (item: HTMLElement) => {
+        const newIndex = position === 'below' ? index + 1 : index;
+        onDrop(item, newIndex);
+        setDropTarget(null);
+      };
+    },
+    [onDrop]
+  );
+
   return (
     <div className="flex flex-grow">
       <div
@@ -61,19 +86,52 @@ export function Canvas({
       >
         <div className="bg-gray-800 rounded-lg p-4 h-full">
           {elements.map((element, index) => (
-            <DraggableElement
-              key={element.id}
-              element={element}
-              index={index}
-              onReposition={onReposition}
-              onDelete={handleDelete}
-              isSelected={selectedElementId === element.id}
-              onSelect={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                handleElementSelect(element.id);
-              }}
-            />
+            <React.Fragment key={element.id}>
+              <DropZone
+                onDrop={handleDrop(index, 'above')}
+                isActive={
+                  dropTarget?.index === index && dropTarget.position === 'above'
+                }
+                setDropTarget={setDropTarget}
+                index={index}
+                position="above"
+              />
+              <DraggableElement
+                element={element}
+                index={index}
+                onReposition={onReposition}
+                onDelete={handleDelete}
+                isSelected={selectedElementId === element.id}
+                onSelect={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  handleElementSelect(element.id);
+                }}
+              />
+              {index === elements.length - 1 && (
+                <DropZone
+                  onDrop={handleDrop(index, 'below')}
+                  isActive={
+                    dropTarget?.index === index &&
+                    dropTarget.position === 'below'
+                  }
+                  setDropTarget={setDropTarget}
+                  index={index}
+                  position="below"
+                />
+              )}
+            </React.Fragment>
           ))}
+          {elements.length === 0 && (
+            <DropZone
+              onDrop={handleDrop(0, 'above')}
+              isActive={
+                dropTarget?.index === 0 && dropTarget.position === 'above'
+              }
+              setDropTarget={setDropTarget}
+              index={0}
+              position="above"
+            />
+          )}
         </div>
       </div>
       <RightSidebar
@@ -167,5 +225,40 @@ function DraggableElement({
         </button>
       )}
     </div>
+  );
+}
+
+interface DropZoneProps {
+  onDrop: (item: HTMLElement) => void;
+  isActive: boolean;
+  setDropTarget: React.Dispatch<
+    React.SetStateAction<{ index: number; position: 'above' | 'below' } | null>
+  >;
+  index: number;
+  position: 'above' | 'below';
+}
+
+function DropZone({
+  onDrop,
+  isActive,
+  setDropTarget,
+  index,
+  position,
+}: DropZoneProps) {
+  const [, drop] = useDrop({
+    accept: ['element', 'canvasElement'],
+    drop: (item: HTMLElement) => onDrop(item),
+    hover: () => setDropTarget({ index, position }),
+  });
+
+  const dropRef = useRef<HTMLDivElement>(null);
+  drop(dropRef);
+
+  return (
+    <div
+      ref={dropRef}
+      className={`h-2 transition-all ${isActive ? 'bg-blue-500' : ''}`}
+      onMouseLeave={() => setDropTarget(null)}
+    />
   );
 }

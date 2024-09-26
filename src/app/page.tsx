@@ -12,18 +12,17 @@ export default function Home() {
 
   console.log(canvasState.elements);
 
-  const handleDrop = (item: HTMLElement) => {
-    setCanvasState((prevState) => ({
-      elements: [
-        ...prevState.elements,
-        {
-          ...item,
-          id: `${item.type}-${Date.now()}-${Math.random()
-            .toString(36)
-            .slice(2, 11)}`,
-        },
-      ],
-    }));
+  const handleDrop = (item: HTMLElement, index: number) => {
+    setCanvasState((prevState) => {
+      const newElements = [...prevState.elements];
+      newElements.splice(index, 0, {
+        ...item,
+        id: `${item.type}-${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2, 11)}`,
+      });
+      return { elements: newElements };
+    });
   };
 
   const handleReposition = (dragIndex: number, hoverIndex: number) => {
