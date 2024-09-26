@@ -72,13 +72,15 @@ export function Canvas({
   };
 
   return (
-    <div className="flex flex-grow">
+    <div className="flex flex-grow h-[calc(100vh-64px)]">
+      {' '}
+      {/* Adjust 64px based on your header height */}
       <div
         ref={dropRef}
-        className="flex-grow bg-gray-700 p-4"
+        className="flex-grow bg-gray-700 p-4 overflow-hidden"
         onClick={handleCanvasClick}
       >
-        <div className="bg-gray-800 rounded-lg p-4 h-full">
+        <div className="bg-gray-800 rounded-lg p-4 h-full overflow-y-auto">
           {elements.length === 0 ? (
             <DropZone
               onDrop={(item) => handleDrop(item, 0, 'above')}
