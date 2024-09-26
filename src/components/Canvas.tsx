@@ -1,37 +1,101 @@
 import React, { useRef } from 'react';
-import { useDrop } from 'react-dnd';
+import { useDrag, useDrop } from 'react-dnd';
 import { HTMLElement } from '@/types/EditorTypes';
 import { ElementRenderer } from '@/components/elements/ElementRenderer';
 
 interface CanvasProps {
   elements: HTMLElement[];
   onDrop: (item: HTMLElement) => void;
+  onReposition: (dragIndex: number, hoverIndex: number) => void;
 }
 
-export function Canvas({ elements, onDrop }: CanvasProps) {
+export function Canvas({ elements, onDrop, onReposition }: CanvasProps) {
   const dropRef = useRef<HTMLDivElement>(null);
   const [, drop] = useDrop(() => ({
-    accept: 'element',
-    drop: (item: HTMLElement) => onDrop(item),
+    accept: ['element', 'canvasElement'],
+    drop: (item: HTMLElement & { index?: number }, monitor) => {
+      if (monitor.getItemType() === 'element') {
+        onDrop(item);
+      }
+    },
   }));
 
-  // Connect the drop ref to the div ref
   drop(dropRef);
 
   return (
     <div ref={dropRef} className="flex-grow bg-gray-700 p-4">
       <div className="bg-gray-800 rounded-lg p-4 h-full">
-        {elements.map((element) => (
-          <DraggableElement key={element.id} element={element} />
+        {elements.map((element, index) => (
+          <DraggableElement
+            key={element.id}
+            element={element}
+            index={index}
+            onReposition={onReposition}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function DraggableElement({ element }: { element: HTMLElement }) {
+function DraggableElement({
+  element,
+  index,
+  onReposition,
+}: {
+  element: HTMLElement;
+  index: number;
+  onReposition: (dragIndex: number, hoverIndex: number) => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [{ isDragging }, drag] = useDrag({
+    type: 'canvasElement',
+    item: { index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  const [, drop] = useDrop({
+    accept: 'canvasElement',
+    hover: (item: { index: number }, monitor) => {
+      if (!ref.current) {
+        return;
+      }
+      const dragIndex = item.index;
+      const hoverIndex = index;
+
+      if (dragIndex === hoverIndex) {
+        return;
+      }
+
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const clientOffset = monitor.getClientOffset();
+      const hoverClientY = clientOffset!.y - hoverBoundingRect.top;
+
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+        return;
+      }
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+        return;
+      }
+
+      onReposition(dragIndex, hoverIndex);
+      item.index = hoverIndex;
+    },
+  });
+
+  drag(drop(ref));
+
   return (
-    <div className="relative group">
+    <div
+      ref={ref}
+      className={`relative group ${isDragging ? 'opacity-50' : ''}`}
+      style={{ cursor: 'move' }}
+    >
       <ElementRenderer element={element} />
       <div className="absolute inset-0 bg-blue-500 bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity">
         {/* Add drag handle or other controls here */}
