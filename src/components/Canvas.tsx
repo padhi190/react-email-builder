@@ -79,43 +79,7 @@ export function Canvas({
         onClick={handleCanvasClick}
       >
         <div className="bg-gray-800 rounded-lg p-4 h-full">
-          {elements.map((element, index) => (
-            <React.Fragment key={element.id}>
-              <DropZone
-                onDrop={(item) => handleDrop(item, index, 'above')}
-                isActive={
-                  dropTarget?.index === index && dropTarget.position === 'above'
-                }
-                setDropTarget={setDropTarget}
-                index={index}
-                position="above"
-              />
-              <DraggableElement
-                element={element}
-                index={index}
-                onReposition={onReposition}
-                onDelete={handleDelete}
-                isSelected={selectedElementId === element.id}
-                onSelect={(e: React.MouseEvent) => {
-                  e.stopPropagation();
-                  handleElementSelect(element.id);
-                }}
-              />
-              {index === elements.length - 1 && (
-                <DropZone
-                  onDrop={(item) => handleDrop(item, index, 'below')}
-                  isActive={
-                    dropTarget?.index === index &&
-                    dropTarget.position === 'below'
-                  }
-                  setDropTarget={setDropTarget}
-                  index={index}
-                  position="below"
-                />
-              )}
-            </React.Fragment>
-          ))}
-          {elements.length === 0 && (
+          {elements.length === 0 ? (
             <DropZone
               onDrop={(item) => handleDrop(item, 0, 'above')}
               isActive={
@@ -124,6 +88,58 @@ export function Canvas({
               setDropTarget={setDropTarget}
               index={0}
               position="above"
+            />
+          ) : (
+            elements.map((element, index) => (
+              <React.Fragment key={element.id}>
+                {index === 0 && (
+                  <DropZone
+                    onDrop={(item) => handleDrop(item, index, 'above')}
+                    isActive={
+                      dropTarget?.index === index &&
+                      dropTarget.position === 'above'
+                    }
+                    setDropTarget={setDropTarget}
+                    index={index}
+                    position="above"
+                  />
+                )}
+                <DraggableElement
+                  element={element}
+                  index={index}
+                  onReposition={onReposition}
+                  onDelete={handleDelete}
+                  isSelected={selectedElementId === element.id}
+                  onSelect={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    handleElementSelect(element.id);
+                  }}
+                />
+                {index < elements.length - 1 && (
+                  <DropZone
+                    onDrop={(item) => handleDrop(item, index, 'below')}
+                    isActive={
+                      dropTarget?.index === index &&
+                      dropTarget.position === 'below'
+                    }
+                    setDropTarget={setDropTarget}
+                    index={index}
+                    position="below"
+                  />
+                )}
+              </React.Fragment>
+            ))
+          )}
+          {elements.length > 0 && (
+            <DropZone
+              onDrop={(item) => handleDrop(item, elements.length - 1, 'below')}
+              isActive={
+                dropTarget?.index === elements.length - 1 &&
+                dropTarget.position === 'below'
+              }
+              setDropTarget={setDropTarget}
+              index={elements.length - 1}
+              position="below"
             />
           )}
         </div>
