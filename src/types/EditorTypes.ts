@@ -1,10 +1,10 @@
-export interface HTMLElement {
+export interface EmailElement {
   id: string;
   type: 'heading' | 'paragraph' | 'image' | 'button';
-  content: string;
+  content: React.ReactNode;
   attributes?: Record<string, string>;
 }
 
 export interface CanvasState {
-  elements: HTMLElement[];
+  elements: EmailElement[];
 }

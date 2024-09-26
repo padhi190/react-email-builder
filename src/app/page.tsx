@@ -5,14 +5,15 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { LeftSidebar } from '@/components/LeftSidebar';
 import { Canvas } from '@/components/Canvas';
-import { HTMLElement, CanvasState } from '@/types/EditorTypes';
+import { EmailElement, CanvasState } from '@/types/EditorTypes';
 
 export default function Home() {
   const [canvasState, setCanvasState] = useState<CanvasState>({ elements: [] });
 
   console.log(canvasState.elements);
 
-  const handleDrop = (item: HTMLElement, index: number) => {
+  const handleDrop = (item: EmailElement, index: number) => {
+    console.log('handleDrop index', index);
     setCanvasState((prevState) => {
       const newElements = [...prevState.elements];
       newElements.splice(index, 0, {
@@ -26,6 +27,7 @@ export default function Home() {
   };
 
   const handleReposition = (dragIndex: number, hoverIndex: number) => {
+    console.log('handle reposition', dragIndex, hoverIndex);
     setCanvasState((prevState) => {
       const newElements = [...prevState.elements];
       const [reorderedItem] = newElements.splice(dragIndex, 1);
@@ -40,7 +42,7 @@ export default function Home() {
     }));
   };
 
-  const handleUpdateElement = (updatedElement: HTMLElement) => {
+  const handleUpdateElement = (updatedElement: EmailElement) => {
     setCanvasState((prevState) => ({
       elements: prevState.elements.map((element) =>
         element.id === updatedElement.id ? updatedElement : element

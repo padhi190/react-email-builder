@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { HTMLElement } from '@/types/EditorTypes';
+import { EmailElement } from '@/types/EditorTypes';
 
 interface ElementEditorProps {
-  element: HTMLElement;
-  onUpdate: (updatedElement: HTMLElement) => void;
+  element: EmailElement;
+  onUpdate: (updatedElement: EmailElement) => void;
 }
 
 export function ElementEditor({ element, onUpdate }: ElementEditorProps) {

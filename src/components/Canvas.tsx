@@ -1,15 +1,15 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { HTMLElement } from '@/types/EditorTypes';
+import { EmailElement } from '@/types/EditorTypes';
 import { ElementRenderer } from '@/components/elements/ElementRenderer';
 import { RightSidebar } from './RightSidebar';
 
 interface CanvasProps {
-  elements: HTMLElement[];
-  onDrop: (item: HTMLElement, index: number) => void;
+  elements: EmailElement[];
+  onDrop: (item: EmailElement, index: number) => void;
   onReposition: (dragIndex: number, hoverIndex: number) => void;
   onDelete: (id: string) => void;
-  onUpdateElement: (updatedElement: HTMLElement) => void;
+  onUpdateElement: (updatedElement: EmailElement) => void;
 }
 
 export function Canvas({
@@ -27,21 +27,26 @@ export function Canvas({
     position: 'above' | 'below';
   } | null>(null);
   const dropRef = useRef<HTMLDivElement>(null);
+
+  const handleDrop = useCallback(
+    (item: EmailElement, index: number, position: 'above' | 'below') => {
+      const newIndex = position === 'below' ? index + 1 : index;
+      onDrop(item, newIndex);
+      setDropTarget(null);
+    },
+    [onDrop]
+  );
+
   const [, drop] = useDrop({
     accept: ['element', 'canvasElement'],
-    hover: (item: HTMLElement & { index?: number }, monitor) => {
+    hover: (item: EmailElement & { index?: number }, monitor) => {
       if (monitor.getItemType() === 'element' && dropTarget === null) {
         setDropTarget({ index: elements.length, position: 'below' });
       }
     },
-    drop: (item: HTMLElement & { index?: number }, monitor) => {
-      if (monitor.getItemType() === 'element' && dropTarget) {
-        const newIndex =
-          dropTarget.position === 'below'
-            ? dropTarget.index + 1
-            : dropTarget.index;
-        onDrop(item, newIndex);
-        setDropTarget(null);
+    drop: (item: EmailElement & { index?: number }, monitor) => {
+      if (dropTarget) {
+        handleDrop(item, dropTarget.index, dropTarget.position);
       }
     },
   });
@@ -66,17 +71,6 @@ export function Canvas({
     setSelectedElementId((prevId) => (prevId === id ? null : id));
   };
 
-  const handleDrop = useCallback(
-    (index: number, position: 'above' | 'below') => {
-      return (item: HTMLElement) => {
-        const newIndex = position === 'below' ? index + 1 : index;
-        onDrop(item, newIndex);
-        setDropTarget(null);
-      };
-    },
-    [onDrop]
-  );
-
   return (
     <div className="flex flex-grow">
       <div
@@ -88,7 +82,7 @@ export function Canvas({
           {elements.map((element, index) => (
             <React.Fragment key={element.id}>
               <DropZone
-                onDrop={handleDrop(index, 'above')}
+                onDrop={(item) => handleDrop(item, index, 'above')}
                 isActive={
                   dropTarget?.index === index && dropTarget.position === 'above'
                 }
@@ -109,7 +103,7 @@ export function Canvas({
               />
               {index === elements.length - 1 && (
                 <DropZone
-                  onDrop={handleDrop(index, 'below')}
+                  onDrop={(item) => handleDrop(item, index, 'below')}
                   isActive={
                     dropTarget?.index === index &&
                     dropTarget.position === 'below'
@@ -123,7 +117,7 @@ export function Canvas({
           ))}
           {elements.length === 0 && (
             <DropZone
-              onDrop={handleDrop(0, 'above')}
+              onDrop={(item) => handleDrop(item, 0, 'above')}
               isActive={
                 dropTarget?.index === 0 && dropTarget.position === 'above'
               }
@@ -150,7 +144,7 @@ function DraggableElement({
   isSelected,
   onSelect,
 }: {
-  element: HTMLElement;
+  element: EmailElement;
   index: number;
   onReposition: (dragIndex: number, hoverIndex: number) => void;
   onDelete: (id: string) => void;
@@ -161,7 +155,7 @@ function DraggableElement({
 
   const [{ isDragging }, drag] = useDrag({
     type: 'canvasElement',
-    item: { index },
+    item: () => ({ type: element.type, index, id: element.id }),
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -169,7 +163,7 @@ function DraggableElement({
 
   const [, drop] = useDrop({
     accept: 'canvasElement',
-    hover: (item: { index: number }, monitor) => {
+    hover: (item: { type: string; index: number; id: string }, monitor) => {
       if (!ref.current) {
         return;
       }
@@ -229,7 +223,7 @@ function DraggableElement({
 }
 
 interface DropZoneProps {
-  onDrop: (item: HTMLElement) => void;
+  onDrop: (item: EmailElement) => void;
   isActive: boolean;
   setDropTarget: React.Dispatch<
     React.SetStateAction<{ index: number; position: 'above' | 'below' } | null>
@@ -246,8 +240,8 @@ function DropZone({
   position,
 }: DropZoneProps) {
   const [, drop] = useDrop({
-    accept: ['element', 'canvasElement'],
-    drop: (item: HTMLElement) => onDrop(item),
+    accept: ['element'],
+    drop: onDrop,
     hover: () => setDropTarget({ index, position }),
   });
 

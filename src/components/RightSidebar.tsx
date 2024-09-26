@@ -1,17 +1,17 @@
 import React, { useRef } from 'react';
 import { useDrag } from 'react-dnd';
-import { HTMLElement } from '@/types/EditorTypes';
+import { EmailElement } from '@/types/EditorTypes';
 import { ElementEditor } from '@/components/elements/ElementEditor';
 
-const elementTypes: HTMLElement[] = [
+const elementTypes: EmailElement[] = [
   { id: 'heading', type: 'heading', content: 'Heading' },
   { id: 'paragraph', type: 'paragraph', content: 'Paragraph' },
   // Add more element types as needed
 ];
 
 interface RightSidebarProps {
-  selectedElement: HTMLElement | null;
-  onUpdateElement: (updatedElement: HTMLElement) => void;
+  selectedElement: EmailElement | null;
+  onUpdateElement: (updatedElement: EmailElement) => void;
 }
 
 export function RightSidebar({
@@ -34,7 +34,7 @@ export function RightSidebar({
   );
 }
 
-function DraggableElementType({ element }: { element: HTMLElement }) {
+function DraggableElementType({ element }: { element: EmailElement }) {
   const dragRef = useRef<HTMLDivElement>(null);
   const [, drag] = useDrag(() => ({
     type: 'element',
