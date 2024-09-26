@@ -36,6 +36,12 @@ export default function Home() {
     });
   };
 
+  const handleDelete = (id: string) => {
+    setCanvasState((prevState) => ({
+      elements: prevState.elements.filter((element) => element.id !== id),
+    }));
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex h-screen bg-gray-900">
@@ -49,6 +55,7 @@ export default function Home() {
               elements={canvasState.elements}
               onDrop={handleDrop}
               onReposition={handleReposition}
+              onDelete={handleDelete}
             />
           </div>
         </main>

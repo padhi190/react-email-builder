@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { HTMLElement } from '@/types/EditorTypes';
 import { ElementRenderer } from '@/components/elements/ElementRenderer';
@@ -7,9 +7,18 @@ interface CanvasProps {
   elements: HTMLElement[];
   onDrop: (item: HTMLElement) => void;
   onReposition: (dragIndex: number, hoverIndex: number) => void;
+  onDelete: (id: string) => void;
 }
 
-export function Canvas({ elements, onDrop, onReposition }: CanvasProps) {
+export function Canvas({
+  elements,
+  onDrop,
+  onReposition,
+  onDelete,
+}: CanvasProps) {
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(
+    null
+  );
   const dropRef = useRef<HTMLDivElement>(null);
   const [, drop] = useDrop(() => ({
     accept: ['element', 'canvasElement'],
@@ -22,8 +31,23 @@ export function Canvas({ elements, onDrop, onReposition }: CanvasProps) {
 
   drop(dropRef);
 
+  const handleCanvasClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      setSelectedElementId(null);
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    onDelete(id);
+    setSelectedElementId(null);
+  };
+
   return (
-    <div ref={dropRef} className="flex-grow bg-gray-700 p-4">
+    <div
+      ref={dropRef}
+      className="flex-grow bg-gray-700 p-4"
+      onClick={handleCanvasClick}
+    >
       <div className="bg-gray-800 rounded-lg p-4 h-full">
         {elements.map((element, index) => (
           <DraggableElement
@@ -31,6 +55,12 @@ export function Canvas({ elements, onDrop, onReposition }: CanvasProps) {
             element={element}
             index={index}
             onReposition={onReposition}
+            onDelete={handleDelete}
+            isSelected={selectedElementId === element.id}
+            onSelect={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              setSelectedElementId(element.id);
+            }}
           />
         ))}
       </div>
@@ -42,10 +72,16 @@ function DraggableElement({
   element,
   index,
   onReposition,
+  onDelete,
+  isSelected,
+  onSelect,
 }: {
   element: HTMLElement;
   index: number;
   onReposition: (dragIndex: number, hoverIndex: number) => void;
+  onDelete: (id: string) => void;
+  isSelected: boolean;
+  onSelect: (e: React.MouseEvent) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -93,13 +129,27 @@ function DraggableElement({
   return (
     <div
       ref={ref}
-      className={`relative group ${isDragging ? 'opacity-50' : ''}`}
+      className={`relative group ${isDragging ? 'opacity-50' : ''} ${
+        isSelected ? 'ring-2 ring-blue-500' : ''
+      }`}
       style={{ cursor: 'move' }}
+      onClick={onSelect}
     >
       <ElementRenderer element={element} />
       <div className="absolute inset-0 bg-blue-500 bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity">
         {/* Add drag handle or other controls here */}
       </div>
+      {isSelected && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(element.id);
+          }}
+          className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded"
+        >
+          Delete
+        </button>
+      )}
     </div>
   );
 }
