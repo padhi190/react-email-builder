@@ -61,7 +61,7 @@ export function Canvas({}: CanvasProps) {
   const handleDelete = (id: string) => {
     // onDelete(id);
     dispatch({ type: 'DELETE_ELEMENT', payload: { id } });
-    dispatch({ type: 'SELECT_ELEMENT', payload: { id: null } });
+    // dispatch({ type: 'SELECT_ELEMENT', payload: { id: null } });
   };
 
   const selectedElement =
