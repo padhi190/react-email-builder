@@ -53,7 +53,7 @@ export default function Home() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex h-screen bg-gray-900">
-        <LeftSidebar />
+        {/* <LeftSidebar /> */}
         <main className="flex-grow flex flex-col">
           <header className="bg-gray-800 p-4">
             <h1 className="text-white text-xl font-bold">Canvas Editor</h1>

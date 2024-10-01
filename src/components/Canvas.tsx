@@ -3,6 +3,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { EmailElement } from '@/types/EditorTypes';
 import { ElementRenderer } from '@/components/elements/ElementRenderer';
 import { RightSidebar } from './RightSidebar';
+import { cn } from '@/lib/utils';
 
 interface CanvasProps {
   elements: EmailElement[];
@@ -73,8 +74,6 @@ export function Canvas({
 
   return (
     <div className="flex flex-grow h-[calc(100vh-64px)]">
-      {' '}
-      {/* Adjust 64px based on your header height */}
       <div
         ref={dropRef}
         className="flex-grow bg-gray-700 p-4 overflow-hidden"
@@ -144,6 +143,11 @@ export function Canvas({
               position="below"
             />
           )}
+          <div
+            className={cn('w-full bg-blue-500 opacity-0 transition-opacity', {
+              'opacity-100 h-4': dropTarget?.index === elements.length,
+            })}
+          />
         </div>
       </div>
       <RightSidebar
@@ -231,7 +235,7 @@ function DraggableElement({
             e.stopPropagation();
             onDelete(element.id);
           }}
-          className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded"
+          className="absolute top-0 right-0 bg-destructive text-white p-1 rounded"
         >
           Delete
         </button>
