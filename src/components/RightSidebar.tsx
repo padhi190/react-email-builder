@@ -1,14 +1,14 @@
 import React, { useRef } from 'react';
 import { useDrag } from 'react-dnd';
-import { EmailElement } from '@/types/EditorTypes';
+import { EmailElement, emailElements } from '@/types/EditorTypes';
 import { ElementEditor } from '@/components/elements/ElementEditor';
 import { Heading1Icon, TentIcon, TextIcon } from 'lucide-react';
 
-const elementTypes: EmailElement[] = [
-  { id: 'heading', type: 'heading', content: 'Heading', icon: Heading1Icon },
-  { id: 'paragraph', type: 'paragraph', content: 'Paragraph', icon: TextIcon },
-  // Add more element types as needed
-];
+// const elementTypes: EmailElement[] = [
+//   { id: 'heading', type: 'heading', content: 'Heading', icon: Heading1Icon },
+//   { id: 'paragraph', type: 'text', content: 'Paragraph', icon: TextIcon },
+//   // Add more element types as needed
+// ];
 
 interface RightSidebarProps {
   selectedElement: EmailElement | null;
@@ -27,9 +27,10 @@ export function RightSidebar({
         <>
           <h2 className="text-white text-lg font-semibold mb-4">Elements</h2>
           <div className="grid grid-cols-2 gap-2">
-            {elementTypes.map((element) => (
-              <DraggableElementType key={element.id} element={element} />
-            ))}
+            <DraggableElementType
+              key={emailElements.text.id}
+              element={emailElements.text}
+            />
           </div>
         </>
       )}

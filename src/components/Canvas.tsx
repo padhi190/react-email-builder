@@ -23,6 +23,7 @@ export function Canvas({
   const [selectedElementId, setSelectedElementId] = useState<string | null>(
     null
   );
+  console.log(elements);
   const [dropTarget, setDropTarget] = useState<{
     index: number;
     position: 'above' | 'below';

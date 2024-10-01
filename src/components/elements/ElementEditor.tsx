@@ -7,25 +7,33 @@ interface ElementEditorProps {
 }
 
 export function ElementEditor({ element, onUpdate }: ElementEditorProps) {
-  const [content, setContent] = useState(element.content);
+  const [properties, setProperties] = useState(element.properties);
 
   useEffect(() => {
-    setContent(element.content);
+    setProperties(element.properties);
   }, [element]);
 
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value);
+  const handleContentChange = (updatedProp: Record<string, string>) => {
+    console.log('hanlde Content change', updatedProp);
+    setProperties((prevProps) => ({ ...prevProps, ...updatedProp }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onUpdate({ ...element, content });
+    console.log('handle submit', {
+      ...element,
+      properties,
+    });
+    onUpdate({ ...element, properties });
   };
+
+  const PropertiesComponent = element.propertiesContent;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <h2 className="text-white text-lg font-semibold">Edit {element.type}</h2>
-      <div>
+      <PropertiesComponent {...properties} onChange={handleContentChange} />
+      {/* <div>
         <label
           htmlFor="content"
           className="block text-sm font-medium text-gray-300"
@@ -39,7 +47,7 @@ export function ElementEditor({ element, onUpdate }: ElementEditorProps) {
           className="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           rows={4}
         />
-      </div>
+      </div> */}
       {/* Add more fields for specific attributes based on element type */}
       <button
         type="submit"
