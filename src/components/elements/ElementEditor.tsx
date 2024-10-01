@@ -14,7 +14,6 @@ export function ElementEditor({ element, onUpdate }: ElementEditorProps) {
   }, [element]);
 
   const handleContentChange = (updatedProp: Record<string, string>) => {
-    console.log('hanlde Content change', updatedProp);
     setProperties((prevProps) => ({ ...prevProps, ...updatedProp }));
   };
 
