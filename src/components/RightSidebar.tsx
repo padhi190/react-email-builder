@@ -2,27 +2,16 @@ import React, { useRef } from 'react';
 import { useDrag } from 'react-dnd';
 import { EmailElement, emailElements } from '@/types/EditorTypes';
 import { ElementEditor } from '@/components/elements/ElementEditor';
-import { Heading1Icon, TentIcon, TextIcon } from 'lucide-react';
-
-// const elementTypes: EmailElement[] = [
-//   { id: 'heading', type: 'heading', content: 'Heading', icon: Heading1Icon },
-//   { id: 'paragraph', type: 'text', content: 'Paragraph', icon: TextIcon },
-//   // Add more element types as needed
-// ];
 
 interface RightSidebarProps {
   selectedElement: EmailElement | null;
-  onUpdateElement: (updatedElement: EmailElement) => void;
 }
 
-export function RightSidebar({
-  selectedElement,
-  onUpdateElement,
-}: RightSidebarProps) {
+export function RightSidebar({ selectedElement }: RightSidebarProps) {
   return (
     <div className="w-64 bg-gray-800 p-4">
       {selectedElement ? (
-        <ElementEditor element={selectedElement} onUpdate={onUpdateElement} />
+        <ElementEditor element={selectedElement} />
       ) : (
         <>
           <h2 className="text-white text-lg font-semibold mb-4">Elements</h2>
