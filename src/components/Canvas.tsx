@@ -5,6 +5,8 @@ import { ElementRenderer } from '@/components/elements/ElementRenderer';
 import { RightSidebar } from './RightSidebar';
 import { cn } from '@/lib/utils';
 import { useCanvas } from '@/contexts/CanvasContext';
+import { DropZone } from '@/components/DropZone';
+import { Trash2 } from 'lucide-react';
 
 interface CanvasProps {}
 
@@ -240,46 +242,11 @@ function DraggableElement({
             e.stopPropagation();
             onDelete(element.id);
           }}
-          className="absolute top-0 right-0 bg-destructive text-white p-1 rounded"
+          className="absolute top-0 right-0 bg-destructive text-white p-1 rounded flex gap-2 items-center justify-center"
         >
-          Delete
+          <Trash2 className="w-4 h-4" /> <p className="text-sm">Remove</p>
         </button>
       )}
     </div>
-  );
-}
-
-interface DropZoneProps {
-  onDrop: (item: EmailElement<any>) => void;
-  isActive: boolean;
-  setDropTarget: React.Dispatch<
-    React.SetStateAction<{ index: number; position: 'above' | 'below' } | null>
-  >;
-  index: number;
-  position: 'above' | 'below';
-}
-
-function DropZone({
-  onDrop,
-  isActive,
-  setDropTarget,
-  index,
-  position,
-}: DropZoneProps) {
-  const [, drop] = useDrop({
-    accept: ['element'],
-    drop: onDrop,
-    hover: () => setDropTarget({ index, position }),
-  });
-
-  const dropRef = useRef<HTMLDivElement>(null);
-  drop(dropRef);
-
-  return (
-    <div
-      ref={dropRef}
-      className={`h-2 transition-all ${isActive ? 'bg-blue-500' : ''}`}
-      onMouseLeave={() => setDropTarget(null)}
-    />
   );
 }
