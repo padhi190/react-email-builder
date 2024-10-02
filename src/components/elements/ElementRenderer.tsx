@@ -1,23 +1,16 @@
 import React from 'react';
 import { EmailElement } from '@/types/EditorTypes';
-// Import other element components as needed
-
-// const elementMap: Record<
-//   string,
-//   React.ComponentType<{ element: EmailElement }>
-// > = {
-//   heading: Heading,
-//   text: Text,
-//   // Add other element types here
-// };
 
 export function ElementRenderer({ element }: { element: EmailElement<any> }) {
-  const Component = element.content;
-
-  if (!Component) {
-    console.warn(`Unknown element type: ${element.type}`);
-    return null;
+  if (typeof element.content === 'function') {
+    // If react function component, render it with properties
+    const Component = element.content;
+    return <Component {...element.properties} />;
+  } else if (typeof element.content === 'object' && element.content !== null) {
+    // If another EmailElement, recursively render it
+    return <ElementRenderer element={element.content as EmailElement<any>} />;
   }
 
-  return <Component {...element.properties} />;
+  console.warn(`Unknown element type: ${element.type}`);
+  return null;
 }

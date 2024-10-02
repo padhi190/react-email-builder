@@ -20,6 +20,10 @@ export function RightSidebar({ selectedElement }: RightSidebarProps) {
               key={emailElements.text.id}
               element={emailElements.text}
             />
+            <DraggableElementType
+              key={emailElements.container.id}
+              element={emailElements.container}
+            />
           </div>
         </>
       )}

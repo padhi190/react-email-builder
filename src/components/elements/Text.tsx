@@ -2,7 +2,7 @@
 
 import { ElementType, EmailElement } from '@/types/EditorTypes';
 import { Text as ReactEmailText } from '@react-email/components';
-import { Text, Type } from 'lucide-react';
+import { Type } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
