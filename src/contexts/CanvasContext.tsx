@@ -5,13 +5,16 @@ import { EmailElement } from '@/types/EditorTypes';
 
 // Update CanvasAction type
 type CanvasAction =
-  | { type: 'ADD_ELEMENT'; payload: { element: EmailElement; index: number } }
+  | {
+      type: 'ADD_ELEMENT';
+      payload: { element: EmailElement<any>; index: number };
+    }
   | {
       type: 'REPOSITION_ELEMENT';
       payload: { dragIndex: number; hoverIndex: number };
     }
   | { type: 'DELETE_ELEMENT'; payload: { id: string } }
-  | { type: 'UPDATE_ELEMENT'; payload: { element: EmailElement } }
+  | { type: 'UPDATE_ELEMENT'; payload: { element: EmailElement<any> } }
   | { type: 'SELECT_ELEMENT'; payload: { id: string | null } }
   | { type: 'UNDO' }
   | { type: 'REDO' };
@@ -19,7 +22,7 @@ type CanvasAction =
 // Update CanvasState type
 interface CanvasState {
   present: {
-    elements: EmailElement[];
+    elements: EmailElement<any>[];
     selectedElementId: string | null;
   };
   past: Array<CanvasState['present']>;

@@ -4,7 +4,7 @@ import { EmailElement, emailElements } from '@/types/EditorTypes';
 import { ElementEditor } from '@/components/elements/ElementEditor';
 
 interface RightSidebarProps {
-  selectedElement: EmailElement | null;
+  selectedElement: EmailElement<any> | null;
 }
 
 export function RightSidebar({ selectedElement }: RightSidebarProps) {
@@ -27,7 +27,7 @@ export function RightSidebar({ selectedElement }: RightSidebarProps) {
   );
 }
 
-function DraggableElementType({ element }: { element: EmailElement }) {
+function DraggableElementType({ element }: { element: EmailElement<any> }) {
   const dragRef = useRef<HTMLDivElement>(null);
   const [, drag] = useDrag(() => ({
     type: 'element',

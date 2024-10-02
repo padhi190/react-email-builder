@@ -3,7 +3,7 @@ import { EmailElement } from '@/types/EditorTypes';
 import { useCanvas } from '@/contexts/CanvasContext';
 
 interface ElementEditorProps {
-  element: EmailElement;
+  element: EmailElement<any>;
 }
 
 export function ElementEditor({ element }: ElementEditorProps) {
@@ -15,7 +15,7 @@ export function ElementEditor({ element }: ElementEditorProps) {
   }, [element]);
 
   const handleContentChange = (updatedProp: Record<string, string>) => {
-    setProperties((prevProps) => ({ ...prevProps, ...updatedProp }));
+    setProperties((prevProps: any) => ({ ...prevProps, ...updatedProp }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {

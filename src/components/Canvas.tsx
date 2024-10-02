@@ -19,7 +19,7 @@ export function Canvas({}: CanvasProps) {
   const dropRef = useRef<HTMLDivElement>(null);
 
   const handleDrop = (
-    item: EmailElement,
+    item: EmailElement<any>,
     index: number,
     position: 'above' | 'below'
   ) => {
@@ -38,12 +38,12 @@ export function Canvas({}: CanvasProps) {
 
   const [, drop] = useDrop({
     accept: ['element', 'canvasElement'],
-    hover: (item: EmailElement & { index?: number }, monitor) => {
+    hover: (item: EmailElement<any> & { index?: number }, monitor) => {
       if (monitor.getItemType() === 'element' && dropTarget === null) {
         setDropTarget({ index: state.elements.length, position: 'below' });
       }
     },
-    drop: (item: EmailElement & { index?: number }, monitor) => {
+    drop: (item: EmailElement<any> & { index?: number }, monitor) => {
       if (dropTarget) {
         handleDrop(item, dropTarget.index, dropTarget.position);
       }
@@ -164,7 +164,7 @@ function DraggableElement({
   isSelected,
   onSelect,
 }: {
-  element: EmailElement;
+  element: EmailElement<any>;
   index: number;
   onDelete: (id: string) => void;
   isSelected: boolean;
@@ -250,7 +250,7 @@ function DraggableElement({
 }
 
 interface DropZoneProps {
-  onDrop: (item: EmailElement) => void;
+  onDrop: (item: EmailElement<any>) => void;
   isActive: boolean;
   setDropTarget: React.Dispatch<
     React.SetStateAction<{ index: number; position: 'above' | 'below' } | null>
