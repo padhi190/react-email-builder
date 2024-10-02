@@ -11,7 +11,7 @@ import { EmailElement } from '@/types/EditorTypes';
 //   // Add other element types here
 // };
 
-export function ElementRenderer({ element }: { element: EmailElement }) {
+export function ElementRenderer({ element }: { element: EmailElement<any> }) {
   const Component = element.content;
 
   if (!Component) {
