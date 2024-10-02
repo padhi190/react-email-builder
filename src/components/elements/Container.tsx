@@ -5,11 +5,15 @@ import { Container } from '@react-email/components';
 import { ContainerIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useDrop } from 'react-dnd';
+import { useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 const type: ElementType = 'container';
 
 const properties = {
   backgroundColor: '#ffffff',
+  content: null as EmailElement<any> | null,
 };
 
 type ContainerProperties = typeof properties;
@@ -17,11 +21,36 @@ type ContainerProperties = typeof properties;
 export const ContainerEmailElement: EmailElement<ContainerProperties> = {
   id: 'Container',
   type,
-  content: ({ backgroundColor }: ContainerProperties) => (
-    <Container
-      style={{ backgroundColor: backgroundColor || properties.backgroundColor }}
-    ></Container>
-  ),
+  content: ({ backgroundColor, content }: ContainerProperties) => {
+    const [isActive, setIsActive] = useState(false);
+    const [, drop] = useDrop({
+      accept: ['element'],
+      drop: (item, monitor) => {
+        if (monitor.didDrop()) {
+          return;
+        }
+        // Process the drop here
+        console.log('Dropped in container');
+        // Return a value to indicate that the drop was handled
+        return { handled: true };
+      },
+      hover: () => setIsActive(true),
+    });
+
+    const dropRef = useRef<HTMLDivElement>(null);
+    drop(dropRef);
+
+    return (
+      <div
+        ref={dropRef}
+        className={cn(
+          'h-20 transition-all',
+          isActive ? 'bg-blue-500' : 'bg-green-400'
+        )}
+        onMouseLeave={() => setIsActive(false)}
+      />
+    );
+  },
   icon: ContainerIcon,
   propertiesContent: ({ backgroundColor, onChange }) => {
     return (

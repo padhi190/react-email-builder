@@ -38,14 +38,23 @@ export function Canvas({}: CanvasProps) {
     setDropTarget(null);
   };
 
+  console.log('drop target', dropTarget);
   const [, drop] = useDrop({
     accept: ['element', 'canvasElement'],
     hover: (item: EmailElement<any> & { index?: number }, monitor) => {
-      if (monitor.getItemType() === 'element' && dropTarget === null) {
+      if (
+        monitor.isOver({ shallow: false }) &&
+        monitor.getItemType() === 'element' &&
+        dropTarget === null
+      ) {
+        console.log('hovring');
         setDropTarget({ index: state.elements.length, position: 'below' });
       }
     },
     drop: (item: EmailElement<any> & { index?: number }, monitor) => {
+      if (monitor.didDrop() && monitor.getDropResult()) {
+        return;
+      }
       if (dropTarget) {
         handleDrop(item, dropTarget.index, dropTarget.position);
       }
@@ -233,9 +242,8 @@ function DraggableElement({
       onClick={onSelect}
     >
       <ElementRenderer element={element} />
-      <div className="absolute inset-0 bg-blue-500 bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity">
-        {/* Add drag handle or other controls here */}
-      </div>
+      {/* <div className="absolute inset-0 bg-blue-500 bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity">
+      </div> */}
       {isSelected && (
         <button
           onClick={(e) => {

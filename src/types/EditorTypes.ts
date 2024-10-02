@@ -7,7 +7,7 @@ export type EmailElement<TProps> = {
   id: string;
   type: ElementType;
   icon: React.ElementType;
-  content: React.FC<TProps> | EmailElement<any>;
+  content: React.FC<TProps>;
   propertiesContent: React.FC<TProps & { onChange: Function }>;
   properties: TProps;
 };

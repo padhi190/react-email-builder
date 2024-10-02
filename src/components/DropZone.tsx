@@ -21,7 +21,7 @@ export function DropZone({
 }: DropZoneProps) {
   const [, drop] = useDrop({
     accept: ['element'],
-    drop: onDrop,
+    // drop: onDrop,
     hover: () => setDropTarget({ index, position }),
   });
 
@@ -31,7 +31,9 @@ export function DropZone({
   return (
     <div
       ref={dropRef}
-      className={`h-2 transition-all ${isActive ? 'bg-blue-500' : ''}`}
+      className={`h-2 transition-all ${
+        isActive ? 'bg-blue-500' : 'bg-red-400'
+      }`}
       onMouseLeave={() => setDropTarget(null)}
     />
   );
