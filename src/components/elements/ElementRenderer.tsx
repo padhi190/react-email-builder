@@ -10,7 +10,10 @@ export function ElementRenderer({ element }: ElementRendererProps) {
   const { state } = useCanvas();
   const Component = element.content;
   console.log(state.selectedElementProps);
-  const properties = state.selectedElementProps || element.properties;
+  const isSelected = state.selectedElement?.id === element.id;
+  const properties = isSelected
+    ? state.selectedElementProps
+    : element.properties;
   if (!Component) {
     console.warn(`Unknown element ${element.type}`);
     return null;
