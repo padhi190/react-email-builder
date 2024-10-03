@@ -11,7 +11,7 @@ const type: ElementType = 'text';
 
 const properties = {
   text: 'Text Placeholder',
-  color: '#ffffff',
+  color: '#000000',
 };
 
 type TextProperties = typeof properties;
@@ -27,7 +27,7 @@ export const TextEmailElement: EmailElement<TextProperties> = {
   icon: Type,
   propertiesContent: ({ text, color, onChange }) => {
     return (
-      <div className="space-y-4 text-white">
+      <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="text-content">Text Content</Label>
           <Textarea

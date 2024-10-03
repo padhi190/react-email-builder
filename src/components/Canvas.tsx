@@ -40,11 +40,12 @@ export function Canvas({}: CanvasProps) {
 
   console.log('drop target', dropTarget);
   const [, drop] = useDrop({
-    accept: ['element', 'canvasElement'],
+    accept: ['element', 'canvasElement', 'containerElement'],
     hover: (item: EmailElement<any> & { index?: number }, monitor) => {
       if (
         monitor.isOver({ shallow: false }) &&
-        monitor.getItemType() === 'element' &&
+        (monitor.getItemType() === 'element' ||
+          monitor.getItemType() === 'containerElement') &&
         dropTarget === null
       ) {
         console.log('hovring');
@@ -65,7 +66,7 @@ export function Canvas({}: CanvasProps) {
 
   const handleCanvasClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      dispatch({ type: 'SELECT_ELEMENT', payload: { id: null } });
+      dispatch({ type: 'SELECT_ELEMENT', payload: { element: null } });
     }
   };
 
@@ -75,12 +76,11 @@ export function Canvas({}: CanvasProps) {
     // dispatch({ type: 'SELECT_ELEMENT', payload: { id: null } });
   };
 
-  const selectedElement =
-    state.elements.find((el) => el.id === state.selectedElementId) || null;
+  const selectedElement = state.selectedElement;
 
-  const handleElementSelect = (id: string) => {
+  const handleElementSelect = (element: EmailElement<any>) => {
     // setSelectedElementId((prevId) => (prevId === id ? null : id));
-    dispatch({ type: 'SELECT_ELEMENT', payload: { id } });
+    dispatch({ type: 'SELECT_ELEMENT', payload: { element } });
   };
 
   return (
@@ -92,16 +92,17 @@ export function Canvas({}: CanvasProps) {
       >
         <div className="bg-gray-800 rounded-lg p-4 h-full overflow-y-auto">
           {state.elements.length === 0 ? (
-            <DropZone
-              onDrop={(item) => handleDrop(item, 0, 'above')}
-              isActive={
-                dropTarget?.index === 0 && dropTarget.position === 'above'
-              }
-              setDropTarget={setDropTarget}
-              index={0}
-              position="above"
-            />
+            <div>Drop elements here</div>
           ) : (
+            // <DropZone
+            //   onDrop={(item) => handleDrop(item, 0, 'above')}
+            //   isActive={
+            //     dropTarget?.index === 0 && dropTarget.position === 'above'
+            //   }
+            //   setDropTarget={setDropTarget}
+            //   index={0}
+            //   position="above"
+            // />
             state.elements.map((element, index) => (
               <React.Fragment key={element.id}>
                 {index === 0 && (
@@ -121,10 +122,10 @@ export function Canvas({}: CanvasProps) {
                   index={index}
                   onDelete={handleDelete}
                   //   isSelected={selectedElementId === element.id}
-                  isSelected={state.selectedElementId === element.id}
+                  isSelected={state.selectedElement?.id === element.id}
                   onSelect={(e: React.MouseEvent) => {
                     e.stopPropagation();
-                    handleElementSelect(element.id);
+                    handleElementSelect(element);
                   }}
                 />
                 {index < state.elements.length - 1 && (
@@ -142,7 +143,7 @@ export function Canvas({}: CanvasProps) {
               </React.Fragment>
             ))
           )}
-          {state.elements.length > 0 && (
+          {/* {state.elements.length > 0 && (
             <DropZone
               onDrop={(item) =>
                 handleDrop(item, state.elements.length - 1, 'below')
@@ -155,11 +156,14 @@ export function Canvas({}: CanvasProps) {
               index={state.elements.length - 1}
               position="below"
             />
-          )}
+          )} */}
           <div
-            className={cn('w-full bg-blue-500 opacity-0 transition-opacity', {
-              'opacity-100 h-4': dropTarget?.index === state.elements.length,
-            })}
+            className={cn(
+              'w-full bg-gray-500 opacity-0 transition-opacity rounded-lg',
+              {
+                'opacity-80 h-20': dropTarget?.index === state.elements.length,
+              }
+            )}
           />
         </div>
       </div>

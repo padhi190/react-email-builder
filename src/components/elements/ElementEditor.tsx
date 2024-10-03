@@ -7,15 +7,26 @@ interface ElementEditorProps {
 }
 
 export function ElementEditor({ element }: ElementEditorProps) {
-  const { dispatch } = useCanvas();
-  const [properties, setProperties] = useState(element.properties);
+  const { dispatch, state } = useCanvas();
+  // const [properties, setProperties] = useState(element.properties);
 
-  useEffect(() => {
-    setProperties(element.properties);
-  }, [element]);
+  const properties = state.selectedElementProps;
+
+  // useEffect(() => {
+  //   setProperties(element.properties);
+  // }, [element]);
 
   const handleContentChange = (updatedProp: Record<string, string>) => {
-    setProperties((prevProps: any) => ({ ...prevProps, ...updatedProp }));
+    // setProperties((prevProps: any) => ({ ...prevProps, ...updatedProp }));
+    dispatch({
+      type: 'UPDATE_SELECTED_ELEMENT_PROPS',
+      payload: {
+        properties: {
+          ...state.selectedElementProps,
+          ...updatedProp,
+        },
+      },
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -34,7 +45,7 @@ export function ElementEditor({ element }: ElementEditorProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-white text-lg font-semibold">Edit {element.type}</h2>
+      <h2 className="text-lg font-semibold">Edit {element.type}</h2>
       <PropertiesComponent {...properties} onChange={handleContentChange} />
       <button
         type="submit"

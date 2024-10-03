@@ -1,16 +1,19 @@
 import React from 'react';
 import { EmailElement } from '@/types/EditorTypes';
+import { useCanvas } from '@/contexts/CanvasContext';
 
-export function ElementRenderer({ element }: { element: EmailElement<any> }) {
-  if (typeof element.content === 'function') {
-    // If react function component, render it with properties
-    const Component = element.content;
-    return <Component {...element.properties} />;
-  } else if (typeof element.content === 'object' && element.content !== null) {
-    // If another EmailElement, recursively render it
-    return <ElementRenderer element={element.content as EmailElement<any>} />;
+interface ElementRendererProps {
+  element: EmailElement<any>;
+}
+
+export function ElementRenderer({ element }: ElementRendererProps) {
+  const { state } = useCanvas();
+  const Component = element.content;
+  console.log(state.selectedElementProps);
+  const properties = state.selectedElementProps || element.properties;
+  if (!Component) {
+    console.warn(`Unknown element ${element.type}`);
+    return null;
   }
-
-  console.warn(`Unknown element type: ${element.type}`);
-  return null;
+  return <Component {...properties} />;
 }

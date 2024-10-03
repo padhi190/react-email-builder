@@ -1,7 +1,13 @@
 import React, { useRef } from 'react';
 import { useDrag } from 'react-dnd';
-import { EmailElement, emailElements } from '@/types/EditorTypes';
+import {
+  containerElements,
+  EmailElement,
+  emailElements,
+} from '@/types/EditorTypes';
 import { ElementEditor } from '@/components/elements/ElementEditor';
+import { cn } from '@/lib/utils';
+import { Card } from './ui/card';
 
 interface RightSidebarProps {
   selectedElement: EmailElement<any> | null;
@@ -9,21 +15,30 @@ interface RightSidebarProps {
 
 export function RightSidebar({ selectedElement }: RightSidebarProps) {
   return (
-    <div className="w-64 bg-gray-800 p-4">
+    <div className="w-64 bg-background p-4 text-foreground">
       {selectedElement ? (
         <ElementEditor element={selectedElement} />
       ) : (
         <>
-          <h2 className="text-white text-lg font-semibold mb-4">Elements</h2>
+          <h2 className="text-lg font-semibold mb-4">Elements</h2>
           <div className="grid grid-cols-2 gap-2">
-            <DraggableElementType
-              key={emailElements.text.id}
-              element={emailElements.text}
-            />
-            <DraggableElementType
-              key={emailElements.container.id}
-              element={emailElements.container}
-            />
+            {emailElements.map((element) => (
+              <DraggableElementType
+                key={element.id}
+                element={element}
+                type="element"
+              />
+            ))}
+          </div>
+          <h2 className="text-lg font-semibold my-4">Containers</h2>
+          <div className="grid grid-cols-2 gap-2">
+            {containerElements.map((element) => (
+              <DraggableElementType
+                key={element.id}
+                element={element}
+                type="containerElement"
+              />
+            ))}
           </div>
         </>
       )}
@@ -31,12 +46,19 @@ export function RightSidebar({ selectedElement }: RightSidebarProps) {
   );
 }
 
-function DraggableElementType({ element }: { element: EmailElement<any> }) {
+function DraggableElementType({
+  element,
+  type,
+}: {
+  element: EmailElement<any>;
+  type: string;
+}) {
   const dragRef = useRef<HTMLDivElement>(null);
-  const [, drag] = useDrag(() => ({
-    type: 'element',
+  const [{ isDragging }, drag] = useDrag({
+    type,
     item: { ...element, id: `${element.type}-${Date.now()}` },
-  }));
+    collect: (monitor) => ({ isDragging: monitor.isDragging() }),
+  });
 
   // Connect the drag ref to the div ref
   drag(dragRef);
@@ -44,12 +66,15 @@ function DraggableElementType({ element }: { element: EmailElement<any> }) {
   const Icon = element.icon;
 
   return (
-    <div
+    <Card
       ref={dragRef}
-      className="bg-gray-700 text-white p-2 rounded cursor-move flex flex-col justify-center items-center gap-4 h-[100px] w-[100px] capitalize"
+      className={cn(
+        'bg-background p-2 rounded cursor-move flex flex-col justify-center items-center gap-4 h-[100px] w-[100px] capitalize',
+        isDragging && 'opacity-50'
+      )}
     >
       <Icon size={24} />
       {element.type}
-    </div>
+    </Card>
   );
 }

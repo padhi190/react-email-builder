@@ -24,7 +24,7 @@ export const ContainerEmailElement: EmailElement<ContainerProperties> = {
   content: ({ backgroundColor, content }: ContainerProperties) => {
     const [isActive, setIsActive] = useState(false);
     const [, drop] = useDrop({
-      accept: ['element'],
+      accept: ['element', 'containerElement'],
       drop: (item, monitor) => {
         if (monitor.didDrop()) {
           return;

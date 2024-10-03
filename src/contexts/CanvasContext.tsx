@@ -15,7 +15,14 @@ type CanvasAction =
     }
   | { type: 'DELETE_ELEMENT'; payload: { id: string } }
   | { type: 'UPDATE_ELEMENT'; payload: { element: EmailElement<any> } }
-  | { type: 'SELECT_ELEMENT'; payload: { id: string | null } }
+  | {
+      type: 'SELECT_ELEMENT';
+      payload: { element: EmailElement<any> | null };
+    }
+  | {
+      type: 'UPDATE_SELECTED_ELEMENT_PROPS';
+      payload: { properties: EmailElement<any>['properties'] };
+    }
   | { type: 'UNDO' }
   | { type: 'REDO' };
 
@@ -23,7 +30,8 @@ type CanvasAction =
 interface CanvasState {
   present: {
     elements: EmailElement<any>[];
-    selectedElementId: string | null;
+    selectedElement: EmailElement<any> | null;
+    selectedElementProps?: EmailElement<any>['properties'];
   };
   past: Array<CanvasState['present']>;
   future: Array<CanvasState['present']>;
@@ -31,9 +39,10 @@ interface CanvasState {
 
 // Update initial state
 const initialState: CanvasState = {
-  present: { elements: [], selectedElementId: null },
+  present: { elements: [], selectedElement: null },
   past: [],
   future: [],
+  // selectedElementProps: null,
 };
 
 // Update reducer function
@@ -58,13 +67,20 @@ function canvasReducer(state: CanvasState, action: CanvasAction): CanvasState {
         present: newPresent,
       };
     }
+    case 'UPDATE_SELECTED_ELEMENT_PROPS': {
+      const newPresent = handleAction(state.present, action);
+      return {
+        ...state,
+        present: newPresent,
+      };
+    }
     case 'UNDO':
       if (state.past.length === 0) return state;
       const previous = state.past[state.past.length - 1];
       const newPast = state.past.slice(0, state.past.length - 1);
       return {
         past: newPast,
-        present: { ...previous, selectedElementId: null },
+        present: { ...previous, selectedElement: null },
         future: [state.present, ...state.future],
       };
     case 'REDO':
@@ -73,7 +89,7 @@ function canvasReducer(state: CanvasState, action: CanvasAction): CanvasState {
       const newFuture = state.future.slice(1);
       return {
         past: [...state.past, state.present],
-        present: { ...next, selectedElementId: null },
+        present: { ...next, selectedElement: null },
         future: newFuture,
       };
     default:
@@ -106,7 +122,7 @@ function handleAction(
         elements: state.elements.filter(
           (element) => element.id !== action.payload.id
         ),
-        selectedElementId: null,
+        selectedElement: null,
       };
     case 'UPDATE_ELEMENT':
       return {
@@ -118,12 +134,19 @@ function handleAction(
         ),
       };
     case 'SELECT_ELEMENT':
+      const isTogglingSelect =
+        action.payload.element?.id === state.selectedElement?.id;
       return {
         ...state,
-        selectedElementId:
-          action.payload.id === state.selectedElementId
-            ? null
-            : action.payload.id,
+        selectedElement: isTogglingSelect ? null : action.payload.element,
+        selectedElementProps: isTogglingSelect
+          ? null
+          : action.payload.element?.properties,
+      };
+    case 'UPDATE_SELECTED_ELEMENT_PROPS':
+      return {
+        ...state,
+        selectedElementProps: action.payload.properties,
       };
     default:
       return state;
