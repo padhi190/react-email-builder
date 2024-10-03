@@ -4,16 +4,16 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { LeftSidebar } from '@/components/LeftSidebar';
 import { Canvas } from '@/components/Canvas';
-import { CanvasProvider, useCanvas } from '@/contexts/CanvasContext';
+import { CanvasProvider } from '@/contexts/CanvasContext';
 import { Button } from '@/components/ui/button';
 import { Undo, Redo } from 'lucide-react';
+import { useCanvas } from '@/hooks/useCanvas';
 
 export default function Home() {
   return (
     <CanvasProvider>
       <DndProvider backend={HTML5Backend}>
         <div className="flex h-screen bg-gray-100">
-          {/* <LeftSidebar /> */}
           <main className="flex-grow flex flex-col">
             <CanvasHeader />
             <div className="flex-grow flex">
@@ -36,7 +36,7 @@ function CanvasHeader() {
           variant="outline"
           size="icon"
           disabled={!canUndo}
-          onClick={() => dispatch({ type: 'UNDO' })}
+          onClick={() => dispatch.undo()}
         >
           <Undo className="h-4 w-4" />
         </Button>
@@ -44,7 +44,7 @@ function CanvasHeader() {
           variant="outline"
           size="icon"
           disabled={!canRedo}
-          onClick={() => dispatch({ type: 'REDO' })}
+          onClick={() => dispatch.redo()}
         >
           <Redo className="h-4 w-4" />
         </Button>

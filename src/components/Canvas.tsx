@@ -27,15 +27,8 @@ export function Canvas({}: CanvasProps) {
     position: 'above' | 'below'
   ) => {
     const newIndex = position === 'below' ? index + 1 : index;
-    //   onDrop(item, newIndex);
 
-    dispatch({
-      type: 'ADD_ELEMENT',
-      payload: {
-        index: newIndex,
-        element: item,
-      },
-    });
+    dispatch.addElement({ index: newIndex, element: item });
     setDropTarget(null);
   };
 
@@ -49,7 +42,6 @@ export function Canvas({}: CanvasProps) {
           monitor.getItemType() === 'containerElement') &&
         dropTarget === null
       ) {
-        // console.log('hovring');
         setDropTarget({ index: state.elements.length, position: 'below' });
       }
     },
@@ -67,21 +59,18 @@ export function Canvas({}: CanvasProps) {
     // e.currentTarget is the element that the event listener is attached to
     // This check ensures we're only handling clicks directly on the canvas, not its children
     if (e.target === e.currentTarget) {
-      dispatch({ type: 'SELECT_ELEMENT', payload: { element: null } });
+      dispatch.selectElement({ element: null });
     }
   };
 
   const handleDelete = (id: string) => {
-    // onDelete(id);
-    dispatch({ type: 'DELETE_ELEMENT', payload: { id } });
-    // dispatch({ type: 'SELECT_ELEMENT', payload: { id: null } });
+    dispatch.deleteElement({ id });
   };
 
   const selectedElement = state.selectedElement;
 
   const handleElementSelect = (element: EmailElement<any>) => {
-    // setSelectedElementId((prevId) => (prevId === id ? null : id));
-    dispatch({ type: 'SELECT_ELEMENT', payload: { element } });
+    dispatch.selectElement({ element });
   };
 
   return (
@@ -112,7 +101,6 @@ export function Canvas({}: CanvasProps) {
                   element={element}
                   index={index}
                   onDelete={handleDelete}
-                  //   isSelected={selectedElementId === element.id}
                   isSelected={state.selectedElement?.id === element.id}
                   onSelect={(e: React.MouseEvent) => {
                     e.stopPropagation();
@@ -200,13 +188,7 @@ function DraggableElement({
       }
 
       // Reposition the element while hovering
-      dispatch({
-        type: 'REPOSITION_ELEMENT',
-        payload: {
-          dragIndex: dragIndex,
-          hoverIndex: hoverIndex,
-        },
-      });
+      dispatch.repositionElement({ dragIndex, hoverIndex });
 
       // Update the item's index for correct future hover handling
       item.index = hoverIndex;

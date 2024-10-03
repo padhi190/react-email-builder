@@ -8,24 +8,13 @@ interface ElementEditorProps {
 
 export function ElementEditor({ element }: ElementEditorProps) {
   const { dispatch, state } = useCanvas();
-  // const [properties, setProperties] = useState(element.properties);
 
   const properties = state.selectedElementProps;
 
-  // useEffect(() => {
-  //   setProperties(element.properties);
-  // }, [element]);
-
   const handleContentChange = (updatedProp: Record<string, string>) => {
     // setProperties((prevProps: any) => ({ ...prevProps, ...updatedProp }));
-    dispatch({
-      type: 'UPDATE_SELECTED_ELEMENT_PROPS',
-      payload: {
-        properties: {
-          ...state.selectedElementProps,
-          ...updatedProp,
-        },
-      },
+    dispatch.updateSelectedElementProps({
+      properties: { ...state.selectedElementProps, ...updatedProp },
     });
   };
 
@@ -35,10 +24,7 @@ export function ElementEditor({ element }: ElementEditorProps) {
       ...element,
       properties,
     });
-    dispatch({
-      type: 'UPDATE_ELEMENT',
-      payload: { element: { ...element, properties } },
-    });
+    dispatch.updateElement({ element: { ...element, properties } });
   };
 
   const PropertiesComponent = element.propertiesContent;
