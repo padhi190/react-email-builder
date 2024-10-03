@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useCanvas } from '@/contexts/CanvasContext';
 import { DropZone } from '@/components/DropZone';
 import { Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CanvasProps {}
 
@@ -62,6 +63,9 @@ export function Canvas({}: CanvasProps) {
   drop(dropRef);
 
   const handleCanvasClick = (e: React.MouseEvent) => {
+    // e.target is the element that triggered the event (clicked element)
+    // e.currentTarget is the element that the event listener is attached to
+    // This check ensures we're only handling clicks directly on the canvas, not its children
     if (e.target === e.currentTarget) {
       dispatch({ type: 'SELECT_ELEMENT', payload: { element: null } });
     }
@@ -82,12 +86,11 @@ export function Canvas({}: CanvasProps) {
 
   return (
     <div className="flex flex-grow h-[calc(100vh-64px)]">
-      <div
-        ref={dropRef}
-        className="flex-grow bg-gray-100 p-4 overflow-hidden"
-        onClick={handleCanvasClick}
-      >
-        <div className="bg-background rounded-lg p-4 h-full overflow-y-auto">
+      <div ref={dropRef} className="flex-grow bg-gray-100 p-4 overflow-hidden">
+        <div
+          className="bg-background rounded-lg p-4 h-full overflow-y-auto"
+          onClick={handleCanvasClick}
+        >
           {state.elements.length === 0 ? (
             <div>Drop elements here</div>
           ) : (
@@ -160,6 +163,7 @@ function DraggableElement({
   onSelect: (e: React.MouseEvent) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const { dispatch } = useCanvas();
 
   const [{ isDragging }, drag] = useDrag({
     type: 'canvasElement',
@@ -169,7 +173,6 @@ function DraggableElement({
     }),
   });
 
-  const { dispatch } = useCanvas();
   const [, drop] = useDrop({
     accept: 'canvasElement',
     hover: (item: { type: string; index: number; id: string }, monitor) => {
@@ -196,43 +199,56 @@ function DraggableElement({
         return;
       }
 
-      //   onReposition(dragIndex, hoverIndex);
+      // Reposition the element while hovering
       dispatch({
         type: 'REPOSITION_ELEMENT',
         payload: {
-          dragIndex,
-          hoverIndex,
+          dragIndex: dragIndex,
+          hoverIndex: hoverIndex,
         },
       });
+
+      // Update the item's index for correct future hover handling
       item.index = hoverIndex;
     },
+    // Remove the drop callback
   });
 
   drag(drop(ref));
 
   return (
-    <div
-      ref={ref}
-      className={`relative group ${isDragging ? 'opacity-50' : ''} ${
-        isSelected ? 'ring-2 ring-blue-500' : ''
-      }`}
-      style={{ cursor: 'move' }}
-      onClick={onSelect}
-    >
-      <ElementRenderer element={element} />
-      {/* <div className="absolute inset-0 bg-blue-500 bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity">
-      </div> */}
-      {isSelected && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(element.id);
-          }}
-          className="absolute top-0 right-0 bg-destructive text-white p-1 rounded flex gap-2 items-center justify-center"
-        >
-          <Trash2 className="w-4 h-4" /> <p className="text-sm">Remove</p>
-        </button>
-      )}
-    </div>
+    <AnimatePresence>
+      <motion.div
+        ref={ref}
+        className={`relative group ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
+        style={{ cursor: 'move' }}
+        onClick={onSelect}
+        layout
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{
+          type: 'spring',
+          stiffness: 300,
+          damping: 30,
+          opacity: { duration: 0.2 },
+        }}
+      >
+        <div className={`${isDragging ? 'opacity-50' : ''}`}>
+          <ElementRenderer element={element} />
+        </div>
+        {isSelected && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(element.id);
+            }}
+            className="absolute top-0 right-0 bg-destructive text-white p-1 rounded flex gap-2 items-center justify-center"
+          >
+            <Trash2 className="w-4 h-4" /> <p className="text-sm">Remove</p>
+          </button>
+        )}
+      </motion.div>
+    </AnimatePresence>
   );
 }

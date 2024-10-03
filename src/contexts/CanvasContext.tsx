@@ -113,8 +113,13 @@ function handleAction(
       return { ...state, elements: newElements };
     case 'REPOSITION_ELEMENT':
       const reposElements = [...state.elements];
-      const [reorderedItem] = reposElements.splice(action.payload.dragIndex, 1);
-      reposElements.splice(action.payload.hoverIndex, 0, reorderedItem);
+      [
+        reposElements[action.payload.dragIndex],
+        reposElements[action.payload.hoverIndex],
+      ] = [
+        reposElements[action.payload.hoverIndex],
+        reposElements[action.payload.dragIndex],
+      ];
       return { ...state, elements: reposElements };
     case 'DELETE_ELEMENT':
       return {
