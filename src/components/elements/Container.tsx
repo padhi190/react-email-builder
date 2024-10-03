@@ -18,13 +18,14 @@ const properties = {
 
 type ContainerProperties = typeof properties;
 
+// TODO: don't support nested element for now
 export const ContainerEmailElement: EmailElement<ContainerProperties> = {
   id: 'Container',
   type,
   content: ({ backgroundColor, content }: ContainerProperties) => {
     const [isActive, setIsActive] = useState(false);
     const [, drop] = useDrop({
-      accept: ['element', 'containerElement'],
+      accept: ['element'],
       drop: (item, monitor) => {
         if (monitor.didDrop()) {
           return;

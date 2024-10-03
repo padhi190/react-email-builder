@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <CanvasProvider>
       <DndProvider backend={HTML5Backend}>
-        <div className="flex h-screen bg-gray-900">
+        <div className="flex h-screen bg-gray-100">
           {/* <LeftSidebar /> */}
           <main className="flex-grow flex flex-col">
             <CanvasHeader />
@@ -29,8 +29,8 @@ export default function Home() {
 function CanvasHeader() {
   const { canUndo, canRedo, dispatch } = useCanvas();
   return (
-    <header className="bg-gray-800 p-4 flex items-center">
-      <h1 className="text-white text-xl font-bold mr-4">Canvas Editor</h1>
+    <header className="bg-background p-4 flex items-center">
+      <h1 className="text-xl font-bold mr-4">Email Editor</h1>
       <div className="flex space-x-2">
         <Button
           variant="outline"

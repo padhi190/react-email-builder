@@ -12,7 +12,7 @@ interface CanvasProps {}
 
 export function Canvas({}: CanvasProps) {
   const { state, dispatch } = useCanvas();
-  console.log(state.elements);
+  // console.log(state.elements);
 
   const [dropTarget, setDropTarget] = useState<{
     index: number;
@@ -38,7 +38,7 @@ export function Canvas({}: CanvasProps) {
     setDropTarget(null);
   };
 
-  console.log('drop target', dropTarget);
+  // console.log('drop target', dropTarget);
   const [, drop] = useDrop({
     accept: ['element', 'canvasElement', 'containerElement'],
     hover: (item: EmailElement<any> & { index?: number }, monitor) => {
@@ -48,14 +48,11 @@ export function Canvas({}: CanvasProps) {
           monitor.getItemType() === 'containerElement') &&
         dropTarget === null
       ) {
-        console.log('hovring');
+        // console.log('hovring');
         setDropTarget({ index: state.elements.length, position: 'below' });
       }
     },
     drop: (item: EmailElement<any> & { index?: number }, monitor) => {
-      if (monitor.didDrop() && monitor.getDropResult()) {
-        return;
-      }
       if (dropTarget) {
         handleDrop(item, dropTarget.index, dropTarget.position);
       }
@@ -87,22 +84,13 @@ export function Canvas({}: CanvasProps) {
     <div className="flex flex-grow h-[calc(100vh-64px)]">
       <div
         ref={dropRef}
-        className="flex-grow bg-gray-700 p-4 overflow-hidden"
+        className="flex-grow bg-gray-100 p-4 overflow-hidden"
         onClick={handleCanvasClick}
       >
-        <div className="bg-gray-800 rounded-lg p-4 h-full overflow-y-auto">
+        <div className="bg-background rounded-lg p-4 h-full overflow-y-auto">
           {state.elements.length === 0 ? (
             <div>Drop elements here</div>
           ) : (
-            // <DropZone
-            //   onDrop={(item) => handleDrop(item, 0, 'above')}
-            //   isActive={
-            //     dropTarget?.index === 0 && dropTarget.position === 'above'
-            //   }
-            //   setDropTarget={setDropTarget}
-            //   index={0}
-            //   position="above"
-            // />
             state.elements.map((element, index) => (
               <React.Fragment key={element.id}>
                 {index === 0 && (
@@ -143,23 +131,9 @@ export function Canvas({}: CanvasProps) {
               </React.Fragment>
             ))
           )}
-          {/* {state.elements.length > 0 && (
-            <DropZone
-              onDrop={(item) =>
-                handleDrop(item, state.elements.length - 1, 'below')
-              }
-              isActive={
-                dropTarget?.index === state.elements.length - 1 &&
-                dropTarget.position === 'below'
-              }
-              setDropTarget={setDropTarget}
-              index={state.elements.length - 1}
-              position="below"
-            />
-          )} */}
           <div
             className={cn(
-              'w-full bg-gray-500 opacity-0 transition-opacity rounded-lg',
+              'w-full bg-gray-200 opacity-0 transition-opacity rounded-lg',
               {
                 'opacity-80 h-20': dropTarget?.index === state.elements.length,
               }

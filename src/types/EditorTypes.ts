@@ -12,22 +12,9 @@ export interface EmailElement<TProps> {
   properties: TProps;
 }
 
-export interface ContainerElement<TProps> extends EmailElement<TProps> {}
-
-// type EmailElementsType = {
-//   [key in ElementType]: EmailElement<any>;
-// };
-
-// export const emailElements: EmailElementsType = {
-//   text: TextEmailElement,
-//   container: ContainerEmailElement,
-// };
-
 export const emailElements: EmailElement<any>[] = [TextEmailElement];
 
-export const containerElements: ContainerElement<any>[] = [
-  ContainerEmailElement,
-];
+export const containerElements: EmailElement<any>[] = [ContainerEmailElement];
 
 export interface CanvasState {
   elements: EmailElement<any>[];
