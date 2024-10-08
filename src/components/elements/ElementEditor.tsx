@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { EmailElement } from '@/types/EditorTypes';
+import React from 'react';
+import { elementPropsMap } from '@/types/EditorTypes';
 import { useCanvas } from '@/contexts/CanvasContext';
 
 interface ElementEditorProps {
-  element: EmailElement<any>;
+  // element: React.ComponentType<any>;
 }
 
-export function ElementEditor({ element }: ElementEditorProps) {
+export function ElementEditor({}: ElementEditorProps) {
   const { dispatch, state } = useCanvas();
 
+  if (!state.selectedElementId) return null;
+
   const properties = state.selectedElementProps;
+  const selectedElement = state.elements[state.selectedElementId];
 
   const handleContentChange = (updatedProp: Record<string, string>) => {
-    // setProperties((prevProps: any) => ({ ...prevProps, ...updatedProp }));
     dispatch.updateSelectedElementProps({
       properties: { ...state.selectedElementProps, ...updatedProp },
     });
@@ -21,17 +23,20 @@ export function ElementEditor({ element }: ElementEditorProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('handle submit', {
-      ...element,
       properties,
     });
-    dispatch.updateElement({ element: { ...element, properties } });
+    const newElement = { ...selectedElement, properties };
+
+    dispatch.updateElement({ element: newElement });
   };
 
-  const PropertiesComponent = element.propertiesContent;
+  const PropertiesComponent = elementPropsMap[selectedElement.type];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-lg font-semibold">Edit {element.type}</h2>
+      <h2 className="text-lg font-semibold">
+        Edit {selectedElement.type || 'Element'}
+      </h2>
       <PropertiesComponent {...properties} onChange={handleContentChange} />
       <button
         type="submit"

@@ -2,22 +2,30 @@ import React, { useRef } from 'react';
 import { useDrag } from 'react-dnd';
 import {
   containerElements,
+  elementPropsMap,
   EmailElement,
   emailElements,
 } from '@/types/EditorTypes';
 import { ElementEditor } from '@/components/elements/ElementEditor';
 import { cn } from '@/lib/utils';
 import { Card } from './ui/card';
+import { useCanvas } from '@/hooks/useCanvas';
 
 interface RightSidebarProps {
-  selectedElement: EmailElement<any> | null;
+  selectedElementId: EmailElement<any>['id'] | null;
 }
-
-export function RightSidebar({ selectedElement }: RightSidebarProps) {
+export function RightSidebar({ selectedElementId }: RightSidebarProps) {
+  const { state } = useCanvas();
+  const selectedElement = selectedElementId
+    ? elementPropsMap[
+        state.elements[selectedElementId].type as keyof typeof elementPropsMap
+      ]
+    : null;
+  console.log(selectedElementId, selectedElement);
   return (
     <div className="w-64 bg-background p-4 text-foreground">
       {selectedElement ? (
-        <ElementEditor element={selectedElement} />
+        <ElementEditor />
       ) : (
         <>
           <h2 className="text-lg font-semibold mb-4">Elements</h2>

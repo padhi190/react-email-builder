@@ -42,7 +42,10 @@ export function Canvas({}: CanvasProps) {
           monitor.getItemType() === 'containerElement') &&
         dropTarget === null
       ) {
-        setDropTarget({ index: state.elements.length, position: 'below' });
+        setDropTarget({
+          index: state.elements.root.children?.length || 0,
+          position: 'below',
+        });
       }
     },
     drop: (item: EmailElement<any> & { index?: number }, monitor) => {
@@ -67,8 +70,6 @@ export function Canvas({}: CanvasProps) {
     dispatch.deleteElement({ id });
   };
 
-  const selectedElement = state.selectedElement;
-
   const handleElementSelect = (element: EmailElement<any>) => {
     dispatch.selectElement({ element });
   };
@@ -80,11 +81,11 @@ export function Canvas({}: CanvasProps) {
           className="bg-background rounded-lg p-4 h-full overflow-y-auto"
           onClick={handleCanvasClick}
         >
-          {state.elements.length === 0 ? (
+          {state.elements.root.children?.length === 0 ? (
             <div>Drop elements here</div>
           ) : (
-            state.elements.map((element, index) => (
-              <React.Fragment key={element.id}>
+            state.elements.root.children?.map((elementId, index) => (
+              <React.Fragment key={elementId}>
                 {index === 0 && (
                   <DropZone
                     onDrop={(item) => handleDrop(item, index, 'above')}
@@ -98,16 +99,16 @@ export function Canvas({}: CanvasProps) {
                   />
                 )}
                 <DraggableElement
-                  element={element}
+                  element={state.elements[elementId]}
                   index={index}
                   onDelete={handleDelete}
-                  isSelected={state.selectedElement?.id === element.id}
+                  isSelected={state.selectedElementId === elementId}
                   onSelect={(e: React.MouseEvent) => {
                     e.stopPropagation();
-                    handleElementSelect(element);
+                    handleElementSelect(state.elements[elementId]);
                   }}
                 />
-                {index < state.elements.length - 1 && (
+                {index < state.elements.root.children?.length! - 1 && (
                   <DropZone
                     onDrop={(item) => handleDrop(item, index, 'below')}
                     isActive={
@@ -126,13 +127,14 @@ export function Canvas({}: CanvasProps) {
             className={cn(
               'w-full bg-gray-200 opacity-0 transition-opacity rounded-lg',
               {
-                'opacity-80 h-20': dropTarget?.index === state.elements.length,
+                'opacity-80 h-20':
+                  dropTarget?.index === state.elements.root.children?.length,
               }
             )}
           />
         </div>
       </div>
-      <RightSidebar selectedElement={selectedElement} />
+      <RightSidebar selectedElementId={state.selectedElementId} />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { EmailElement } from '@/types/EditorTypes';
+import { elementContentMap, EmailElement } from '@/types/EditorTypes';
 import { useCanvas } from '@/contexts/CanvasContext';
 
 interface ElementRendererProps {
@@ -9,9 +9,9 @@ interface ElementRendererProps {
 export function ElementRenderer({ element }: ElementRendererProps) {
   const { state } = useCanvas();
 
-  const Component = element.content;
+  const Component = elementContentMap[element.type];
 
-  const isSelected = state.selectedElement?.id === element.id;
+  const isSelected = state.selectedElementId === element.id;
   const properties = isSelected
     ? state.selectedElementProps
     : element.properties;

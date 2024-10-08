@@ -22,54 +22,62 @@ type ContainerProperties = typeof properties;
 export const ContainerEmailElement: EmailElement<ContainerProperties> = {
   id: 'Container',
   type,
-  content: ({ backgroundColor, content }: ContainerProperties) => {
-    const [isActive, setIsActive] = useState(false);
-    const [, drop] = useDrop({
-      accept: ['element'],
-      drop: (item, monitor) => {
-        if (monitor.didDrop()) {
-          return;
-        }
-        // Process the drop here
-        console.log('Dropped in container');
-        // Return a value to indicate that the drop was handled
-        return { handled: true };
-      },
-      hover: () => setIsActive(true),
-    });
-
-    const dropRef = useRef<HTMLDivElement>(null);
-    drop(dropRef);
-
-    return (
-      <div
-        ref={dropRef}
-        className={cn(
-          'h-20 transition-all',
-          isActive ? 'bg-blue-500' : 'bg-green-400'
-        )}
-        onMouseLeave={() => setIsActive(false)}
-      />
-    );
-  },
   icon: ContainerIcon,
-  propertiesContent: ({ backgroundColor, onChange }) => {
-    return (
-      <div className="space-y-4 text-white">
-        <div className="space-y-2">
-          <Label htmlFor="text-color">Container Color</Label>
-          <div className="flex items-center space-x-2">
-            <Input
-              id="bg-color"
-              value={backgroundColor}
-              type="color"
-              className="h-10 w-14 p-1"
-              onChange={(e) => onChange({ color: e.target.value })}
-            />
-          </div>
+  properties,
+};
+
+export const ContainerEmailContent = ({
+  backgroundColor,
+  content,
+}: ContainerProperties) => {
+  const [isActive, setIsActive] = useState(false);
+  const [, drop] = useDrop({
+    accept: ['element'],
+    drop: (item, monitor) => {
+      if (monitor.didDrop()) {
+        return;
+      }
+      // Process the drop here
+      console.log('Dropped in container');
+      // Return a value to indicate that the drop was handled
+      return { handled: true };
+    },
+    hover: () => setIsActive(true),
+  });
+
+  const dropRef = useRef<HTMLDivElement>(null);
+  drop(dropRef);
+
+  return (
+    <div
+      ref={dropRef}
+      className={cn(
+        'h-20 transition-all',
+        isActive ? 'bg-blue-500' : 'bg-green-400'
+      )}
+      onMouseLeave={() => setIsActive(false)}
+    />
+  );
+};
+
+export const ContainerEmailProperties = ({
+  backgroundColor,
+  onChange,
+}: ContainerProperties & { onChange: Function }) => {
+  return (
+    <div className="space-y-4 text-white">
+      <div className="space-y-2">
+        <Label htmlFor="text-color">Container Color</Label>
+        <div className="flex items-center space-x-2">
+          <Input
+            id="bg-color"
+            value={backgroundColor}
+            type="color"
+            className="h-10 w-14 p-1"
+            onChange={(e) => onChange({ color: e.target.value })}
+          />
         </div>
       </div>
-    );
-  },
-  properties,
+    </div>
+  );
 };

@@ -19,39 +19,45 @@ type TextProperties = typeof properties;
 export const TextEmailElement: EmailElement<TextProperties> = {
   id: 'Text',
   type,
-  content: ({ color, text }: TextProperties) => (
-    <ReactEmailText style={{ color: color || properties.color }}>
-      {text || properties.text}
-    </ReactEmailText>
-  ),
   icon: Type,
-  propertiesContent: ({ text, color, onChange }) => {
-    return (
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="text-content">Text Content</Label>
-          <Textarea
-            id="text-content"
-            value={text}
-            onChange={(e) => onChange({ text: e.target.value })}
-            placeholder="Enter text content"
-            className="min-h-[100px]"
+  properties,
+};
+
+export const TextEmailContent = ({ color, text }: TextProperties) => (
+  <ReactEmailText style={{ color: color || properties.color }}>
+    {text || properties.text}
+  </ReactEmailText>
+);
+
+export const TextEmailProperties = ({
+  text,
+  color,
+  onChange,
+}: TextProperties & { onChange: Function }) => {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="text-content">Text Content</Label>
+        <Textarea
+          id="text-content"
+          value={text}
+          onChange={(e) => onChange({ text: e.target.value })}
+          placeholder="Enter text content"
+          className="min-h-[100px]"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="text-color">Text Color</Label>
+        <div className="flex items-center space-x-2">
+          <Input
+            id="text-color"
+            value={color}
+            type="color"
+            className="h-10 w-14 p-1"
+            onChange={(e) => onChange({ color: e.target.value })}
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="text-color">Text Color</Label>
-          <div className="flex items-center space-x-2">
-            <Input
-              id="text-color"
-              value={color}
-              type="color"
-              className="h-10 w-14 p-1"
-              onChange={(e) => onChange({ color: e.target.value })}
-            />
-          </div>
-        </div>
       </div>
-    );
-  },
-  properties,
+    </div>
+  );
 };
