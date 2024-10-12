@@ -8,6 +8,7 @@ import { useCanvas } from '@/contexts/CanvasContext';
 import { DropZone } from '@/components/DropZone';
 import { Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Preview from '@/components/Preview';
 
 interface CanvasProps {}
 
@@ -81,61 +82,105 @@ export function Canvas({}: CanvasProps) {
           className="bg-background rounded-lg p-4 h-full overflow-y-auto"
           onClick={handleCanvasClick}
         >
-          {state.elements.root.children?.length === 0 ? (
-            <div>Drop elements here</div>
+          {state.mode === 'edit' ? (
+            <EditMode
+              elements={state.elements}
+              selectedElementId={state.selectedElementId}
+              dropTarget={dropTarget}
+              handleDrop={handleDrop}
+              handleDelete={handleDelete}
+              handleElementSelect={handleElementSelect}
+              setDropTarget={setDropTarget}
+            />
           ) : (
-            state.elements.root.children?.map((elementId, index) => (
-              <React.Fragment key={elementId}>
-                {index === 0 && (
-                  <DropZone
-                    onDrop={(item) => handleDrop(item, index, 'above')}
-                    isActive={
-                      dropTarget?.index === index &&
-                      dropTarget.position === 'above'
-                    }
-                    setDropTarget={setDropTarget}
-                    index={index}
-                    position="above"
-                  />
-                )}
-                <DraggableElement
-                  element={state.elements[elementId]}
-                  index={index}
-                  onDelete={handleDelete}
-                  isSelected={state.selectedElementId === elementId}
-                  onSelect={(e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    handleElementSelect(state.elements[elementId]);
-                  }}
-                />
-                {index < state.elements.root.children?.length! - 1 && (
-                  <DropZone
-                    onDrop={(item) => handleDrop(item, index, 'below')}
-                    isActive={
-                      dropTarget?.index === index &&
-                      dropTarget.position === 'below'
-                    }
-                    setDropTarget={setDropTarget}
-                    index={index}
-                    position="below"
-                  />
-                )}
-              </React.Fragment>
-            ))
+            <Preview elements={state.elements} />
           )}
-          <div
-            className={cn(
-              'w-full bg-gray-200 opacity-0 transition-opacity rounded-lg',
-              {
-                'opacity-80 h-20':
-                  dropTarget?.index === state.elements.root.children?.length,
-              }
-            )}
-          />
         </div>
       </div>
-      <RightSidebar selectedElementId={state.selectedElementId} />
+      {state.mode === 'edit' && (
+        <RightSidebar selectedElementId={state.selectedElementId} />
+      )}
     </div>
+  );
+}
+
+interface EditModeProps {
+  elements: Record<string, EmailElement<any>>;
+  selectedElementId: string | null;
+  dropTarget: { index: number; position: 'above' | 'below' } | null;
+  handleDrop: (
+    item: EmailElement<any>,
+    index: number,
+    position: 'above' | 'below'
+  ) => void;
+  handleDelete: (id: string) => void;
+  handleElementSelect: (element: EmailElement<any>) => void;
+  setDropTarget: React.Dispatch<
+    React.SetStateAction<{ index: number; position: 'above' | 'below' } | null>
+  >;
+}
+
+function EditMode({
+  elements,
+  selectedElementId,
+  dropTarget,
+  handleDrop,
+  handleDelete,
+  handleElementSelect,
+  setDropTarget,
+}: EditModeProps) {
+  return (
+    <>
+      {elements.root.children?.length === 0 ? (
+        <div>Drop elements here</div>
+      ) : (
+        elements.root.children?.map((elementId, index) => (
+          <React.Fragment key={elementId}>
+            {index === 0 && (
+              <DropZone
+                onDrop={(item) => handleDrop(item, index, 'above')}
+                isActive={
+                  dropTarget?.index === index && dropTarget.position === 'above'
+                }
+                setDropTarget={setDropTarget}
+                index={index}
+                position="above"
+              />
+            )}
+            <DraggableElement
+              element={elements[elementId]}
+              index={index}
+              onDelete={handleDelete}
+              isSelected={selectedElementId === elementId}
+              onSelect={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                handleElementSelect(elements[elementId]);
+              }}
+            />
+            {index < elements.root.children?.length! - 1 && (
+              <DropZone
+                onDrop={(item) => handleDrop(item, index, 'below')}
+                isActive={
+                  dropTarget?.index === index && dropTarget.position === 'below'
+                }
+                setDropTarget={setDropTarget}
+                index={index}
+                position="below"
+              />
+            )}
+          </React.Fragment>
+        ))
+      )}
+      <div
+        className={cn(
+          'w-full bg-gray-200 opacity-0 transition-opacity rounded-lg',
+          {
+            'opacity-80 h-20':
+              dropTarget?.index === elements.root.children?.length,
+          }
+        )}
+      />
+    </>
   );
 }
 

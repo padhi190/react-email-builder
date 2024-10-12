@@ -24,6 +24,12 @@ interface CanvasState {
   elements: Record<string, EmailElement<any>>;
   selectedElementId: EmailElement<any>['id'] | null;
   selectedElementProps?: EmailElement<any>['properties'];
+  mode:
+    | 'edit'
+    | 'desktop_preview'
+    | 'mobile_preview'
+    | 'react_code'
+    | 'html_code';
   past: Array<{ elements: CanvasState['elements'] }>;
   future: Array<{ elements: CanvasState['elements'] }>;
 }
@@ -44,6 +50,7 @@ const initialState: CanvasState = {
   elements: { root: rootElement },
   selectedElementId: null,
   selectedElementProps: undefined,
+  mode: 'edit',
   past: [],
   future: [],
 };
@@ -214,6 +221,12 @@ const canvasSlice = createSlice({
       state.selectedElementProps = undefined;
       state.future.shift();
     },
+    changeMode: (
+      state,
+      action: PayloadAction<{ mode: CanvasState['mode'] }>
+    ) => {
+      state.mode = action.payload.mode;
+    },
   },
 });
 
@@ -227,6 +240,7 @@ export const {
   updateSelectedElementProps,
   undo,
   redo,
+  changeMode,
 } = canvasSlice.actions;
 
 // Export the reducer

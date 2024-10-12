@@ -9,6 +9,7 @@ import {
   updateSelectedElementProps,
   undo,
   redo,
+  changeMode,
 } from '@/store/canvasSlice';
 
 export function useCanvas() {
@@ -33,6 +34,8 @@ export function useCanvas() {
       ) => dispatch(updateSelectedElementProps(payload)),
       undo: () => dispatch(undo()),
       redo: () => dispatch(redo()),
+      changeMode: (payload: Parameters<typeof changeMode>[0]) =>
+        dispatch(changeMode(payload)),
     },
     canUndo: state.past.length > 0,
     canRedo: state.future.length > 0,
